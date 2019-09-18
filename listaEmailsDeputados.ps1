@@ -6,7 +6,8 @@ Setor: Ditec/Coaus/Satus
 Versões: 1.0 - Criação do script
 Dependências: Módulo https://www.powershellgallery.com/packages/FileSystemForms/
 #>
-
+# Importa os módulos necessários
+Import-Module FileSystemForms
 # Seleciona a pasta
 $File = Select-FileSystemForm
 # Busca os objetos e escreve os e-mails em um arquivo na pasta selecionada

@@ -186,3 +186,4 @@ function Get-ItemId
         }
     }
 }
+Export-ModuleMember -Function Get-ItemId

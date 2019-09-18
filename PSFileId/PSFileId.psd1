@@ -9,10 +9,10 @@
 @{
 
 # Arquivo de módulo de script ou módulo binário associado a este manifesto.
-# RootModule = ''
+RootModule = 'PSFileId.psm1'
 
 # Número da versão deste módulo.
-ModuleVersion = '1.0.0'
+ModuleVersion = '1.0.2'
 
 # PSEditions com suporte
 # CompatiblePSEditions = @()
@@ -69,7 +69,7 @@ PowerShellHostVersion = '5.1.14393.2214'
 # NestedModules = @()
 
 # Funções a serem exportadas deste módulo. Para melhor desempenho, não use curingas e não exclua a entrada. Use uma matriz vazia se não houver nenhuma função a ser exportada.
-FunctionsToExport = @()
+FunctionsToExport = @('Get-ItemId')
 
 # Cmdlets a serem exportados deste módulo. Para melhor desempenho, não use curingas e não exclua a entrada. Use uma matriz vazia se não houver nenhum cmdlet a ser exportado.
 CmdletsToExport = @()

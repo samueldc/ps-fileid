@@ -1,0 +1,12 @@
+Set-ExecutionPolicy RemoteSigned
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://urca2.redecamara.camara.gov.br/PowerShell/ -Authentication Kerberos
+Import-PSSession $session
+
+** P/ permissão de enviar como e receber como (Caixas Institucional)
+  Add-MailboxPermission -Identity NOME -User  NOME-u -AccessRights:FullAccess -AutoMapping $true
+  Add-ADPermission -Identity NOME -User NOME-u -ExtendedRights "Send As"
+
+** P/ mover caixas institucionais de "CAIXAS DE CORREIO"  para "COMPARTILHADOS"
+    Get-Mailbox agendadopresidente | Set-Mailbox -Type shared
+
+Remove-PSSession $Session

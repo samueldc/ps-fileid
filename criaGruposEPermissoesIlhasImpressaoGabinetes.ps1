@@ -12,7 +12,7 @@ Import-Module ImportExcel
 # Variáveis globais
 
 # Se true, ativa o mode de teste (dry-run) nos comandos que utilizam este parâmetro
-$WhatIf = $false
+$WhatIf = $true
 $Confirm = $false
 
 # Caminho e nome dos arquivos de log
@@ -59,7 +59,7 @@ function atribuiPermissoes {
     $gabinetes = Import-Excel -Path "c:/Temp/gabinetes.xlsx" -WorkSheetname todos
 
     $gabinetes | ForEach-Object {
-        if ( $PSItem -and $PSItem.carteira -and ( $PSItem.anexo -eq $Anexo ) -and ( $PSItem.andar -eq $Andar ) ) {
+        if ( $PSItem -and $PSItem.carteira -and ( $PSItem.anexo -eq $Anexo ) -and ( ( $PSItem.andar -eq $Andar ) -or ( $Andar -eq "Todos" ) ) ) {
             Add-ADGroupMember -Identity $NomeGrupoFila -Members "Dep-$($PSItem.carteira)-P" -Confirm:$Confirm -WhatIf:$WhatIf
                 if($?){
                     "[Add-ADGroupMember] Permissao no grupo " + $NomeGrupoFila + " atribuida para " + "Dep-$($PSItem.carteira)-P" + "." *>> $PathLog
@@ -79,6 +79,7 @@ $filas = Import-Excel -Path "c:/Temp/ilhasImpressao.xlsx" -WorkSheetname filas
 
 $filas | ForEach-Object {
     if ( $PSItem -and $PSItem.fila ) {
+        <#
         New-ADGroup -Name $PSItem.fila -SamAccountName $PSItem.fila -GroupCategory Security -GroupScope Global -DisplayName $PSItem.fila -Path $OUGrupoFila -Description $PSItem.fila -Confirm:$Confirm -WhatIf:$WhatIf
             if($?){
                 "[New-ADGroup] Grupo " + $PSItem.fila + " criado." *>> $PathLog
@@ -87,6 +88,7 @@ $filas | ForEach-Object {
                 "[New-ADGroup] Ocorreu um erro ao criar o grupo " + $PSItem.fila + "." *>> $PahLogErro
                 $GruposNaoCriados++
             }
+        #>
         atribuiPermissoes -NomeGrupoFila $PSItem.fila -Anexo $PSItem.anexo -Andar $PSItem.andar
         $GruposTotal++
     }

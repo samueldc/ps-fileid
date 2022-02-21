@@ -1,1 +1,0 @@
-﻿Get-ADUser -Identity P_999152 -Properties MemberOf | ForEach-Object { $_.MemberOf | Get-ADGroup | Select Name }

@@ -50,6 +50,10 @@ $script:memberDefinition = @'
         }
     }
 
+    public unsafe struct FILE_ID_128 {
+        public fixed byte Identifier[16];
+    }
+
     public struct FILE_ID_BOTH_DIR_INFO {
         public uint NextEntryOffset;
         public uint FileIndex;
@@ -70,18 +74,22 @@ $script:memberDefinition = @'
         public string FileName;
     }
 
-    public struct FILE_BASIC_INFO
-    {
-        [MarshalAs(UnmanagedType.I8)]
-        public Int64 CreationTime;
-        [MarshalAs(UnmanagedType.I8)]
-        public Int64 LastAccessTime;
-        [MarshalAs(UnmanagedType.I8)]
-        public Int64 LastWriteTime;
-        [MarshalAs(UnmanagedType.I8)]
-        public Int64 ChangeTime;
-        [MarshalAs(UnmanagedType.U4)]
-        public UInt32 FileAttributes;
+    public struct FILE_ID_EXTD_DIR_INFO {
+        public uint NextEntryOffset;
+        public uint FileIndex;
+        public LargeInteger CreationTime;
+        public LargeInteger LastAccessTime;
+        public LargeInteger LastWriteTime;
+        public LargeInteger ChangeTime;
+        public LargeInteger EndOfFile;
+        public LargeInteger AllocationSize;
+        public uint FileAttributes;
+        public uint FileNameLength;
+        public uint EaSize;
+        public uint ReparsePointTag;
+        public FILE_ID_128 FileId;
+        [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public string FileName;
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -101,7 +109,7 @@ $script:memberDefinition = @'
     public static extern bool GetFileInformationByHandleEx(
         IntPtr hFile,
         int infoClass,
-        out FILE_ID_BOTH_DIR_INFO fileInfo,
+        out FILE_ID_EXTD_DIR_INFO fileInfo,
         uint dwBufferSize);
 
 '@
@@ -122,7 +130,9 @@ function Get-ItemId
 
     begin
     {
-        Add-Type -MemberDefinition $script:memberDefinition -Name File -Namespace Kernel32
+        $cp = New-Object System.CodeDom.Compiler.CompilerParameters
+        $cp.CompilerOptions = '/unsafe'
+        Add-Type -MemberDefinition $script:memberDefinition -Name File -Namespace Kernel32 -CompilerParameters $cp
     }
 
     process
@@ -146,11 +156,10 @@ function Get-ItemId
             }
 
             # Output object
-            #$fileBasicInfo = New-Object -TypeName Kernel32.File+FILE_BASIC_INFO
-            $fileBasicInfo = New-Object -TypeName Kernel32.File+FILE_ID_BOTH_DIR_INFO
+            $fileBasicInfo = New-Object -TypeName Kernel32.File+FILE_ID_EXTD_DIR_INFO
 
             Write-Verbose "GetFileInformationByHandleEx: Get basic info"
-            $bRetrieved = [Kernel32.File]::GetFileInformationByHandleEx($fileHandle,19,
+            $bRetrieved = [Kernel32.File]::GetFileInformationByHandleEx($fileHandle,0x13,
                 [ref]$fileBasicInfo,
                 [System.Runtime.InteropServices.Marshal]::SizeOf($fileBasicInfo))
 
@@ -167,7 +176,7 @@ function Get-ItemId
                 #LastWriteTime  = [System.DateTime]::FromFileTime($fileBasicInfo.LastWriteTime)
                 #ChangeTime     = [System.DateTime]::FromFileTime($fileBasicInfo.ChangeTime)
                 #FileAttributes = $fileBasicInfo.FileAttributes
-                FileId         = $fileBasicInfo.FileId.QuadPart
+                FileId         = $fileBasicInfo.FileId
             }
         }
         catch

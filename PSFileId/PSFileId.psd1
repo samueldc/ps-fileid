@@ -12,7 +12,7 @@
 RootModule = 'PSFileId.psm1'
 
 # Número da versão deste módulo.
-ModuleVersion = '1.0.2'
+ModuleVersion = '1.0.3'
 
 # PSEditions com suporte
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'Samuel Diniz Casimiro'
 CompanyName = 'Câmara dos Deputados'
 
 # Instrução de direitos autorais para este módulo
-Copyright = '(c) 2019 Samuel Diniz Casimiro. Todos os direitos reservados.'
+Copyright = '(c) 2022 Samuel Diniz Casimiro. Todos os direitos reservados.'
 
 # Descrição da funcionalidade fornecida por este módulo
 Description = 'Compile the Windows API GetFileInformationByHandleEx function and exposes it by a PowerShell function called Get-ItemId.'
